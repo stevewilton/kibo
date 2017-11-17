@@ -25,7 +25,7 @@ def convert_to_binary(c):
    return binlist
 
 
-def WorkloadAnomolies():
+def WorkloadAnomalies():
 
    consonants = "bcdfghjklmnpqrstvwxz"
    vowels = "aeiouy"

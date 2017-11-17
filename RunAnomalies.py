@@ -12,12 +12,12 @@ from Lstm import LSTM
 from Dense import Dense
 from Settings import *
 from Network import *
-from WorkloadAnomolies import *
+from WorkloadAnomalies import *
 
 
 print "Constructing data set"
 
-training_set, validaton_set, test_set, vocab_size = WorkloadAnomolies()
+training_set, validaton_set, test_set, vocab_size = WorkloadAnomalies()
 
 
 print "Initializing Network"
@@ -78,10 +78,10 @@ for i in range(0, len(test_set)):
           true_correct += 1
 
 
-print "Of the %d anomolies:" % (anomoly_correct + anomoly_wrong)
+print "Of the %d anomalies:" % (anomoly_correct + anomoly_wrong)
 print "    correctly predicted =   %d" % anomoly_correct
 print "    incorrectly predicted = %d" % anomoly_wrong
-print "Of the %d non-anomolies:" % (true_correct + true_wrong)
+print "Of the %d non-anomalies:" % (true_correct + true_wrong)
 print "    correctly predicted   = %d" % true_correct
 print "    incorrectly predicted = %d" % true_wrong
 
