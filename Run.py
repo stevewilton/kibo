@@ -21,10 +21,11 @@ training_set, validaton_set, test_set, vocab_size, reverse_dictionary = Workload
 
 print "Initializing Network"
 
-network = Network(vocab_size, vocab_size, vocab_size, 0)
+#network = Network(vocab_size, vocab_size, vocab_size, 0)
 
-
-
+network = Network(vocab_size)
+network.add_level(1, vocab_size)
+network.add_level(0, vocab_size)
 
 outstr = ""
 
@@ -55,14 +56,14 @@ for i in range(0, len(test_set)):
    last_output = " "   
    outstr = "Seeding with: >"
    for l in range(0, 10):
-       last_output, last_h = network.forward_pass(test_example_x[l])
+       last_output = network.forward_pass(test_example_x[l])
        outstr = outstr + reverse_dictionary[max_val_index(test_example_x[l])]
    outstr = outstr + "<"
    print outstr
 
    outstr = "Generated Text: >"
    for l in range(0,40):
-       o,h = network.forward_pass(last_output)
+       o = network.forward_pass(last_output)
        outstr = outstr + reverse_dictionary[max_val_index(o)]
        last_output = o
    outstr = outstr + "<"

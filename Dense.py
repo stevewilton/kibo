@@ -42,29 +42,24 @@ class Dense(object):
        self.W = return_random_np_subarray(num_outputs, num_inputs)
        self.B = return_constant_np_subarray(num_outputs, 1, -1)
 
-    def preturb_weight(self, y_index, x_index, delta):
-       self.W[y_index][x_index] = self.W[y_index][x_index] + delta
+#    def preturb_weight(self, y_index, x_index, delta):
+#       self.W[y_index][x_index] = self.W[y_index][x_index] + delta
 
     def forward_pass(self, x):
-        ft = sigmoid(mydot(self.W, np.array(x)) + self.B)
         self.inputs = x
-        return (ft)
+        self.z = mydot(self.W, np.array(x)) + self.B
+        self.a = sigmoid(self.z)
+        return (self.a)
 
-    def get_deltas(self, y):
-       z = mydot(self.W, self.inputs) + self.B
-       a = sigmoid(z)
-#       error = 0.5*np.sum( (a-y)*(a-y) )
-#       print error
-       self.delta_outputs = (a - y) * sigmoid_prime(z)
-
-       
-       self.delta_inputs = mydot(self.W.T,self.delta_outputs)
-       return(self.delta_inputs)
+    def get_deltas(self, deltas_from_previous_layer):
+        self.deltas = deltas_from_previous_layer * sigmoid_prime(self.z)
+        deltas_to_send_to_next_layer = mydot(self.W.T, self.deltas)
+        return(deltas_to_send_to_next_layer)
 
     def update_weights(self, learning_rate):
-       self.W = self.W - learning_rate * mydot(self.delta_outputs, self.inputs.T)
-       self.B = self.B - learning_rate * self.delta_outputs
+       self.W = self.W - learning_rate * mydot(self.deltas, self.inputs.T)
+       self.B = self.B - learning_rate * self.deltas
 
-    def get_dcdw(self, yindex, xindex):
-       m = np.dot(self.delta_outputs, self.inputs.T)
-       return m[yindex][xindex]
+#    def get_dcdw(self, yindex, xindex):
+#       m = np.dot(self.deltas, self.inputs.T)
+#       return m[yindex][xindex]

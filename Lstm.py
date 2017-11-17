@@ -105,7 +105,7 @@ class LSTM(object):
 #   here again, because if we do a second forward pass by accident ,the
 #   state will change.  
 
-    def get_deltas(self, x, dh):
+    def get_deltas(self, dh):
 
         self.do = dh * np.tanh(self.Ct)
 
@@ -122,6 +122,9 @@ class LSTM(object):
         self.dihat = self.di * self.it * (1 - self.it)
         self.dfhat = self.df * self.ft * (1 - self.ft)
         self.dohat = self.do * self.ot * (1 - self.ot)
+
+        # we should send the deltas for x but this hasn't been implemented yet
+        return(0.0)
 
 
     def update_weights(self, learning_rate):

@@ -10,7 +10,7 @@ import math
 from FixedPoint import FixedPoint
 from Settings import *
 
-num_training_examples = 1000000
+num_training_examples = 1000
 num_validation_examples = 10
 num_test_examples = 32
 min_example_length = 90
@@ -42,6 +42,7 @@ def WorkloadChars():
    # read the original text
 
    training_file = 'words.txt'
+   training_file = '../yy'
 
    with open(training_file) as f:
        content = flatten(f.readlines())
