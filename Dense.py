@@ -57,7 +57,7 @@ class Dense(object):
         return(deltas_to_send_to_next_layer)
 
     def update_weights(self, learning_rate):
-       self.W = self.W - learning_rate * mydot(self.deltas, self.inputs.T)
+       self.W = self.W - learning_rate * mydot(self.deltas,  np.array(self.inputs).T)
        self.B = self.B - learning_rate * self.deltas
 
 #    def get_dcdw(self, yindex, xindex):
