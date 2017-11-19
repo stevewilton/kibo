@@ -53,18 +53,32 @@ class FixedPoint:
 
 
    def __eq__(self,b):
+      if (isinstance(b,int) | isinstance(b,float)):
+         return(self.encoded == b)
+
       return (self.encoded == b.encoded)
 
    def __gt__(self,b):
+      if (isinstance(b,int) | isinstance(b,float)):
+         return(self.encoded > b)
+
       return (self.encoded > b.encoded)
 
    def __lt__(self,b):
+      if (isinstance(b,int) | isinstance(b,float)):
+         return(self.encoded < b)
       return (self.encoded < b.encoded)
 
    def __ge__(self,b):
+      if (isinstance(b,int) | isinstance(b,float)):
+         return(self.encoded <= b)
+
       return (self.encoded >= b.encoded)
 
    def __le__(self,b):
+      if (isinstance(b,int) | isinstance(b,float)):
+         return(self.encoded <= b)
+
       return (self.encoded <= b.encoded)
 
    def __add__(self, b):
