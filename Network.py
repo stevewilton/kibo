@@ -104,6 +104,7 @@ class Network(object):
 
        # do a forward pass to get outputs
        o = self.forward_pass(x)
+       err = 0.5*np.sum( (o-y)*(o-y) )
        deltas_to_send_down = o-y
 
        for i in range(self.num_levels-1, -1, -1):
@@ -112,6 +113,12 @@ class Network(object):
        # now update the weights
        for i in range(0,self.num_levels):
           self.level[i].update_weights(learning_rate)
-          
+
+       # return err in floating point, even if all calcs are in fixed point
+
+       if FIXED_POINT:
+          return err.val()
+       else:
+          return err
 
 

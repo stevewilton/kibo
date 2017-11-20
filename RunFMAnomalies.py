@@ -32,16 +32,21 @@ for layer_size in LAYER_SIZES:
 
 print "Training Network:"
 
+final_err = 0
+err = 0
 for i in range(0,len(training_set)):
-   if i % 100 == 0:
-      print "training example %d/%d" % (i, len(training_set) )
 
    training_example_x = training_set[i][0]
    training_example_y = training_example_x
 
-   o = network.train(training_example_x, training_example_y, 0.1)
+   err += network.train(training_example_x, training_example_y, 0.1)
 
+   final_err = err
+   if i % 100 == 0:
+      print "training example %d/%d,  err=%f" % (i, len(training_set), err/100 )
+      err = 0
 
+   
 print "Trained network:"
 network.print_weights_and_biases()
 
@@ -61,18 +66,25 @@ for i in range(0, len(test_set)):
    test_example_y = test_set[i][1]
 
    o = network.forward_pass(test_example_x)
-   diff = np.sum((o-test_example_x)*(o-test_example_x))
+   diff_r = np.sum((o-test_example_x)*(o-test_example_x))
+
+   if FIXED_POINT:
+      diff = diff_r.val()
+   else:
+      diff = diff_r     
+
 
    # use an arbitary threshold of 0.5
    # why? because it works
 
    if (test_example_y):  # if this was supposed to be an anomaly
-      if (diff > 0.5):
+      if (diff > final_err*1.1):
           anomaly_correct += 1
       else:
           anomaly_wrong += 1
    else:   # it was not supposed to be an anomaly
-      if (diff > 0.5):
+      if (diff > final_err*1.1):
+          print diff
           true_wrong += 1
       else:
           true_correct += 1

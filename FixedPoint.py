@@ -13,6 +13,9 @@ class FixedPoint:
    def decode(self, encoded_value):
          return encoded_value / (1 << self.frac_bits)
 
+   def val(self):
+         return self.encoded / (1 << self.frac_bits)
+
    def __float__(self):
          return self.encoded / (1 << self.frac_bits)
    
@@ -71,7 +74,7 @@ class FixedPoint:
 
    def __ge__(self,b):
       if (isinstance(b,int) | isinstance(b,float)):
-         return(self.encoded <= b)
+         return(self.encoded >= b)
 
       return (self.encoded >= b.encoded)
 

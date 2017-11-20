@@ -13,10 +13,10 @@ from Settings import *
 
 # Hyper-parameters
 DATASET_FILE = "fm_data.bin"
-NUM_TRAINING_EXAMPLES = 10000
+NUM_TRAINING_EXAMPLES = 100000
 TRAIN_SET_RATIO = 0.8
 TEST_SET_RATIO = 0.1
-GAUSSIAN_NOISE_SD = 0.15
+GAUSSIAN_NOISE_SD = 0.02
 
 def load_real_data():
     x = scipy.fromfile(open(DATASET_FILE), dtype=scipy.complex64)
@@ -42,6 +42,8 @@ def make_fft_windows(i,q,window_size):
         fft_i = np.imag(fft_res)
         data.append(np.concatenate((fft_r,fft_i)).tolist())
     return data
+
+
 
 def convert_to_list(c):
     l = [[x] for x in c]
@@ -83,6 +85,10 @@ def WorkloadFMAnomalies(window_size):
             y = 0
         validation_set_x.append(convert_to_list(noise))
         validation_set_y.append(y)
+
+
+
+    
 
     training_set = zip(training_set_x, training_set_y)
     validation_set = zip(validation_set_x, validation_set_y)
