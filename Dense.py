@@ -48,11 +48,13 @@ class Dense(object):
     def forward_pass(self, x):
         self.inputs = x
         self.z = mydot(self.W, np.array(x)) + self.B
-        self.a = sigmoid(self.z)
+        self.a = tanh(self.z)
+        #self.a = sigmoid(self.z)
         return (self.a)
 
     def get_deltas(self, deltas_from_previous_layer):
-        self.deltas = deltas_from_previous_layer * sigmoid_prime(self.z)
+        self.deltas = deltas_from_previous_layer * tanh_prime(self.z)
+        #self.deltas = deltas_from_previous_layer * sigmoid_prime(self.z)
         deltas_to_send_to_next_layer = mydot(self.W.T, self.deltas)
         return(deltas_to_send_to_next_layer)
 

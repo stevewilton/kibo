@@ -94,6 +94,9 @@ def sigmoid(z):
 def sigmoid_prime(z):
     return sigmoid(z)*(1.0-sigmoid(z)) 
 
+def tanh(z):
+    return (1.0-np.exp(-2*z))/(1.0+np.exp(-2*z))
+
 def tanh_prime(z): 
     return 1.0 - np.tanh(z) * np.tanh(z)
 
