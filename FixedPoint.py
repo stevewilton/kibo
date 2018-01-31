@@ -1,11 +1,53 @@
 import math
 from Settings import *
 
+#-----------------------------------------------------------------------------
+#
+# Permission to use, copy, and modify this software and its documentation is
+# hereby granted only under the following terms and conditions.  Both the
+# above copyright notice and this permission notice must appear in all copies
+# of the software, derivative works or modified versions, and any portions
+# thereof, and both notices must appear in supporting documentation.
+#
+# This software may be distributed (but not offered for sale or transferred
+# for compensation) to third parties, provided such third parties agree to
+# abide by the terms and conditions of this notice.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHORS, AS
+# WELL AS THE UNIVERSITY OF BRITISH COLUMBIA AND 
+# THE UNIVERSITY OF SYDNEY DISCLAIM ALL WARRANTIES WITH
+# REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS.   IN NO EVENT SHALL THE
+# AUTHORS OR THE UNIVERSITY OF BRITISH COLUMBIA OR THE 
+# UNIVERSITY OF SYDNEY BE LIABLE FOR ANY SPECIAL, DIRECT,
+# INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+# PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
+# OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION
+# WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#---------------------------------------------------------------------------
+
+
+# Defaults
+
+FRAC_BITS = 16
+INT_BITS = 8
+
 class FixedPoint:
+
+   # Initializer.  Can create an object with any 
+   def __init__(self, value=0, int_bits=INT_BITS, frac_bits=FRAC_BITS):
+      self.int_bits = int_bits
+      self.frac_bits = frac_bits 
+      self.max_value = (1<<(int_bits-1+frac_bits))-1
+      self.min_value = -(1<<(int_bits-1+frac_bits))
+      if (value == 0):
+         self.encoded = 0
+      else:
+         self.encoded = self.encode(value)
 
    def clip(self, x):
       return max(self.min_value,min(self.max_value, x))
-
 
    def encode(self, value):
          return self.clip(round(value * (1<< self.frac_bits)))
@@ -19,15 +61,6 @@ class FixedPoint:
    def __float__(self):
          return self.encoded / (1 << self.frac_bits)
    
-   def __init__(self, value=0, int_bits=INT_BITS, frac_bits=FRAC_BITS):
-      self.int_bits = int_bits
-      self.frac_bits = frac_bits 
-      self.max_value = (1<<(int_bits-1+frac_bits))-1
-      self.min_value = -(1<<(int_bits-1+frac_bits))
-      if (value == 0):
-         self.encoded = 0
-      else:
-         self.encoded = self.encode(value)
       
    def string_raw(self):
       return "%x" % self.encoded
@@ -51,6 +84,7 @@ class FixedPoint:
 
    def __iadd__(self, b):
       print "IN IADD"
+
    def __imul__(self, b):
       print "IN IMUL"
 
