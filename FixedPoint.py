@@ -35,8 +35,12 @@ INT_BITS = 8
 
 class FixedPoint:
 
-   # Initializer.  Can create an object with any 
    def __init__(self, value=0, int_bits=INT_BITS, frac_bits=FRAC_BITS):
+      """ Create an Fixed Point object. """
+
+      assert int_bits > 0, "int_bits must be greater than 0"
+      assert frac_bits > 0, "frac_bits must be greater than 0"
+      
       self.int_bits = int_bits
       self.frac_bits = frac_bits 
       self.max_value = (1<<(int_bits-1+frac_bits))-1
@@ -47,34 +51,43 @@ class FixedPoint:
          self.encoded = self.encode(value)
 
    def clip(self, x):
+      """ Clip a value if it lies outside the allowable range"""
       return max(self.min_value,min(self.max_value, x))
 
    def encode(self, value):
-         return self.clip(round(value * (1<< self.frac_bits)))
+      """ Convert a value to the encoded representation and clip it """
+      return self.clip(round(value * (1<< self.frac_bits)))
                    
    def decode(self, encoded_value):
-         return encoded_value / (1 << self.frac_bits)
+      """ Return the decoded value."""
+      return encoded_value / (1 << self.frac_bits)
 
    def val(self):
-         return self.encoded / (1 << self.frac_bits)
+      """ The same as decode.  Provided to be more intuitive name """
+      return self.encoded / (1 << self.frac_bits)
 
    def __float__(self):
-         return self.encoded / (1 << self.frac_bits)
+      """ Return the float (decoded) value """
+      return self.encoded / (1 << self.frac_bits)
    
+   def __int__(self):
+      """ Return the integer portion of the (decoded) value """    
+      return int(self.val())
       
    def string_raw(self):
-      return "%x" % self.encoded
-
-   def print_val(self):
-      return "%f" % self.decode(self.encoded)
+      """ Return the raw (encoded) value.  Normally only use this for debugging """
+      return "0x%x" % self.encoded
 
    def __str__(self):
-      return "%f" % self.decode(self.encoded)
+      """ string representation.  Include the size and the decoded value """      """ string representation.  Include the size and the decoded value """
+      return "<%d,%d>%f" % (self.int_bits,self.frac_bits,self.decode(self.encoded))
 
    def __repr__(self):
-      return "%f" % self.decode(self.encoded)
+      """ string representation.  Include the size and the decoded value """
+      return "<%d,%d>%f" % (self.int_bits,self.frac_bits,self.decode(self.encoded))
                      
-   def print_info(self):
+   def info(self):
+      """ Print information about the object in long form.  Useful for debugging """
       print "encoded = 0x%x" % self.encoded
       print "int_bits = %d" % self.int_bits
       print "frac_bits = %d" % self.frac_bits
