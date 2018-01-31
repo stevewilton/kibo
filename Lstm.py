@@ -41,6 +41,26 @@ class LSTM(object):
        print ("\nBo:")
        print (self.Bo)
 
+    def save_weights_and_biases(self,directoryName,level):
+       np.save(directoryName+"/level"+str(level)+"_Wf", self.Wf)
+       np.save(directoryName+"/level"+str(level)+"_Bf", self.Bf)
+       np.save(directoryName+"/level"+str(level)+"_Wi", self.Wi)
+       np.save(directoryName+"/level"+str(level)+"_Bi", self.Bi)
+       np.save(directoryName+"/level"+str(level)+"_Wc", self.Wc)
+       np.save(directoryName+"/level"+str(level)+"_Bc", self.Bc)
+       np.save(directoryName+"/level"+str(level)+"_Wo", self.Wo)
+       np.save(directoryName+"/level"+str(level)+"_Bo", self.Bo)
+
+    def load_weights_and_biases(self,directoryName,level):
+       self.Wf = np.load(directoryName+"/level"+str(level)+"_Wf.npy")
+       self.Bf = np.load(directoryName+"/level"+str(level)+"_Bf.npy")
+       self.Wi = np.load(directoryName+"/level"+str(level)+"_Wi.npy")
+       self.Bi = np.load(directoryName+"/level"+str(level)+"_Bi.npy")
+       self.Wc = np.load(directoryName+"/level"+str(level)+"_Wc.npy")
+       self.Bc = np.load(directoryName+"/level"+str(level)+"_Bc.npy")
+       self.Wo = np.load(directoryName+"/level"+str(level)+"_Wo.npy")
+       self.Bo = np.load(directoryName+"/level"+str(level)+"_Bo.npy")
+
     def print_internal_state(self):
        print ("\nC:")
        print (self.C)

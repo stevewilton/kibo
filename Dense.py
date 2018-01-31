@@ -28,6 +28,14 @@ class Dense(object):
        print ("\nB:")
        print (self.B)
 
+    def save_weights_and_biases(self,directoryName,level):
+       np.save(directoryName+"/level"+str(level)+"_W", self.W)
+       np.save(directoryName+"/level"+str(level)+"_B", self.B)
+
+    def load_weights_and_biases(self,directoryName,level):
+       self.W = np.load(directoryName+"/level"+str(level)+"_W.npy")
+       self.B = np.load(directoryName+"/level"+str(level)+"_B.npy")
+
     def __init__(self, num_inputs, num_outputs):
 
 #       Initialize weights

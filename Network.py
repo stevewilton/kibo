@@ -7,6 +7,7 @@ import random
 import collections
 import time
 import math
+import os
 from FixedPoint import FixedPoint
 from Settings import *
 from Misc import *
@@ -26,6 +27,20 @@ class Network(object):
            print "Level %d:" % i
            self.level[i].print_weights_and_biases()
 
+    def save_weights_and_biases(self,directoryName):
+       if not os.path.exists(directoryName):
+           os.makedirs(directoryName)
+       for i in range(0,self.num_levels):
+           print "Saving weights and biases for Level %d" % i
+           self.level[i].save_weights_and_biases(directoryName,i)
+
+    def load_weights_and_biases(self,directoryName):
+       if not os.path.exists(directoryName):
+           print("Files to load not found")
+       else:
+         for i in range(0,self.num_levels):
+             print "Loading weights and biases for Level %d" % i
+             self.level[i].load_weights_and_biases(directoryName,i)
 
 #    def reset(self):
 #       self.lstm.reset()
