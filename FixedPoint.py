@@ -95,41 +95,53 @@ class FixedPoint:
       print "min_value = 0x%x" % self.min_value
       print "decoded value = %f" % self.decode(self.encoded)
 
-   def __iadd__(self, b):
-      print "IN IADD"
 
-   def __imul__(self, b):
-      print "IN IMUL"
-
+   #######################################################################
+   # Over-ride comparison functions.  Note that these comparison functions
+   # allow for a comparison of a fixed point to a constant value, or two
+   # fixed point numbers.  In all cases, it is the decoded value that is
+   # compared.  So, if two numbers have different representations, but encode
+   # the same value, they will be equal.  Warning: different representations
+   # may lead to different rounding behaviour
+   #########################################################################
 
    def __eq__(self,b):
-      if (isinstance(b,int) | isinstance(b,float)):
-         return(self.encoded == b)
+      """ equality comparison"""
 
-      return (self.encoded == b.encoded)
+      # See if we are comparing to a fixed integer or floating point number
+
+      if (isinstance(b,int) | isinstance(b,float)):
+         return(self.val() == b)
+
+      # Otherwise, we are comparing two fixed point values
+      return (self.val() == b.val())
 
    def __gt__(self,b):
+      """ greather than comparison """
       if (isinstance(b,int) | isinstance(b,float)):
-         return(self.encoded > b)
-
-      return (self.encoded > b.encoded)
+         return(self.val() > b)
+      return (self.val() > b.val())
 
    def __lt__(self,b):
+      """ less than comparison """
       if (isinstance(b,int) | isinstance(b,float)):
-         return(self.encoded < b)
-      return (self.encoded < b.encoded)
+         return(self.val() < b)
+      return (self.val() < b.val())
 
    def __ge__(self,b):
+      """ greater or equal to """
       if (isinstance(b,int) | isinstance(b,float)):
-         return(self.encoded >= b)
-
-      return (self.encoded >= b.encoded)
+         return(self.val() >= b)
+      return (self.val() >= b.val())
 
    def __le__(self,b):
+      """ less than or equal to """
       if (isinstance(b,int) | isinstance(b,float)):
-         return(self.encoded <= b)
+         return(self.val() <= b)
+      return (self.val() <= b.val())
 
-      return (self.encoded <= b.encoded)
+
+   # 
 
    def __add__(self, b):
       if (isinstance(b,int) | isinstance(b,float)):
@@ -171,6 +183,12 @@ class FixedPoint:
       retval.encoded = retval.clip(self.encoded-b.encoded)
       return retval
 
+
+   def __iadd__(self, b):
+      print "IN IADD"
+
+   def __imul__(self, b):
+      print "IN IMUL"
 
 
    def __rsub__(self, b):
