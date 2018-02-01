@@ -43,16 +43,16 @@ num_test_examples = 50000
 min_example_length = 90
 max_example_length = 180
 
-def convert_to_binary(c):
+def convert_to_binary(c, fixed_point):
    binstr = ' '.join(format(ord(x), 'b') for x in c)
-   if FIXED_POINT:
+   if fixed_point:
       binlist = [ [FixedPoint(float(x))] for x in binstr ]   
    else:
       binlist = [ [float(x)] for x in binstr ]   
    return binlist
 
 
-def WorkloadAnomalies():
+def WorkloadAnomalies(fixed_point = 0):
 
    consonants = "bcdfghjklmnpqrstvwxz"
    vowels = "aeiouy"
@@ -66,7 +66,7 @@ def WorkloadAnomalies():
 
    for i in range(0,num_training_examples):
       cpos = random.choice(consonants)
-      training_set_x.append(convert_to_binary(cpos) )
+      training_set_x.append(convert_to_binary(cpos, fixed_point) )
       # this is unsupervised, so no training set y
       training_set_y.append(0)
 

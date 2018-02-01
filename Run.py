@@ -42,9 +42,11 @@ from WorkloadChars import *
 from Misc import *
 from ArrayUtilities import *
 
+FIXED_POINT = 0
+
 print "Constructing data set"
 
-training_set, validaton_set, test_set, vocab_size, reverse_dictionary = WorkloadChars()
+training_set, validaton_set, test_set, vocab_size, reverse_dictionary = WorkloadChars(fixed_point)
 
 print "Initializing Network"
 

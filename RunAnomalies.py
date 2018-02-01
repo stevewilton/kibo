@@ -41,10 +41,11 @@ from WorkloadAnomalies import *
 from Misc import *
 from ArrayUtilities import *
 
+FIXED_POINT = 0
 
 print "Constructing data set"
 
-training_set, validaton_set, test_set, vocab_size = WorkloadAnomalies()
+training_set, validaton_set, test_set, vocab_size = WorkloadAnomalies(FIXED_POINT)
 
 
 print "Initializing Network"

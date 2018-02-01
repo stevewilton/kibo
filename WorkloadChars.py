@@ -54,8 +54,8 @@ def flatten(l):
     out = out + " " + item.strip()
   return [out]
 
-def one_hot(val, len):
-  if FIXED_POINT:
+def one_hot(val, len, fixed_point):
+  if fixed_point:
      retval = [[FixedPoint(-0.04) for col in range(1)] for row in range(len)]
      retval[val][0] = FixedPoint(1)
   else:
@@ -64,7 +64,7 @@ def one_hot(val, len):
   return(retval)
 
 
-def WorkloadChars():
+def WorkloadChars(fixed_point = 0):
 
    # read the original text
 
@@ -101,7 +101,7 @@ def WorkloadChars():
    vocab_size = len(dictionary)
    onehot = dict()
    for f in set:
-      onehot[f] = one_hot(dictionary[f], vocab_size)
+      onehot[f] = one_hot(dictionary[f], vocab_size, fixed_point)
 
    # determine training, validation, and test vectors
 

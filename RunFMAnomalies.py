@@ -44,6 +44,7 @@ from ArrayUtilities import *
 # Hyper-parameters
 FFT_WINDOW_SIZE = 32
 LAYER_SIZES = [16,8,16,32]
+FIXED_POINT = 0
 
 print "Constructing data set"
 

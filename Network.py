@@ -157,9 +157,8 @@ class Network(object):
 
        # return err in floating point, even if all calcs are in fixed point
 
-       if FIXED_POINT:
-          return err.val()
+       if (isinstance(err, FixedPoint)):
+             return err.val()
        else:
-          return err
-
+             return err
 
