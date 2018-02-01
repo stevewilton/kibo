@@ -28,6 +28,13 @@ from Settings import *
 #---------------------------------------------------------------------------
 
 
+
+# One of the following should be set:
+
+MODE_STRICT_WITH_ERROR_CHECKING = 0
+MODE_STRICT_WITHOUT_ERROR_CHECKING = 0
+MODE_RELAXED_WITH_ERROR_CHECKING = 1
+
 # Strict Mode.  In Strict mode, all operands must be of the same
 # type, and any conversions between types need to be done explicitly,
 # using resize function.  In Non-strict mode, you can do things like
@@ -36,15 +43,13 @@ from Settings import *
 # mode, you can also do arithmetic on fixed point values of different sizes;
 # in that case, the result will be the size of the first operand
 #
-STRICT_MODE = 0
-
-# Fast mode: if you are in fast mode, no error checking on operand types 
-# for arithmetic operations is done.  Note that fast mode only works if you
-# are in STRICT_MODE
+# Error checking: checks that the input types are reasonable.  Good for
+# debugging, but slows things down.  
 #
-FAST_MODE = 0
+# Note: the fastest is MODE_STRICT_WITHOUT_ERROR_CHECKING
 
-assert (FAST_MODE==0) | (STRICT_MODE==1) , "FAST_MODE can only used if STRICT_MODE is true"
+assert(MODE_STRICT_WITH_ERROR_CHECKING + MODE_STRICT_WITHOUT_ERROR_CHECKING + MODE_RELAXED_WITH_ERROR_CHECKING == 1), "Must select exactly one Mode"
+
 
 
 # Defaults.  
@@ -58,8 +63,8 @@ class FixedPoint:
    def __init__(self, value=0, int_bits=INT_BITS, frac_bits=FRAC_BITS):
       """ Create an Fixed Point object. """
 
-      assert int_bits > 0, "int_bits must be greater than 0"
-      assert frac_bits > 0, "frac_bits must be greater than 0"
+      assert int_bits >= 1, "int_bits must be greater or equal than 1"
+      assert frac_bits >= 0, "frac_bits must be greater or eqaul than 0"
       assert isinstance(value, int) | isinstance(value, float) | isinstance(value, FixedPoint), "initialized value type error"
 
       if (isinstance(value, FixedPoint)):
@@ -76,8 +81,8 @@ class FixedPoint:
    def resize(self, int_bits, frac_bits):
       """ Convert the value to a new representation, but keep the value the same """
 
-      assert int_bits > 0, "int_bits must be greater than 0"
-      assert frac_bits > 0, "frac_bits must be greater than 0"
+      assert int_bits >= 1, "int_bits must be greater or equal than 1"
+      assert frac_bits >= 0, "frac_bits must be greater or equal than 0"
 
       stored_value = self.val()
       self.int_bits = int_bits
@@ -96,15 +101,15 @@ class FixedPoint:
                    
    def decode(self, encoded_value):
       """ Return the decoded value."""
-      return encoded_value / (1 << self.frac_bits)
+      return float(encoded_value) / (1 << self.frac_bits)
 
    def val(self):
       """ The same as decode.  Provided to be more intuitive name """
-      return self.encoded / (1 << self.frac_bits)
+      return float(self.encoded) / (1 << self.frac_bits)
 
    def __float__(self):
       """ Return the float (decoded) value """
-      return self.encoded / (1 << self.frac_bits)
+      return float(self.encoded) / (1 << self.frac_bits)
    
    def __int__(self):
       """ Return the integer portion of the (decoded) value """    
@@ -146,34 +151,43 @@ class FixedPoint:
 
       # See if we are comparing to a fixed integer or floating point number
 
-      if (isinstance(b,int) | isinstance(b,float)):
-         return(self.val() == b)
+      if (MODE_RELAXED_WITH_ERROR_CHECKING):
+         if (isinstance(b,int) | isinstance(b,float)):
+            return(self.val() == b)
 
       # Otherwise, we are comparing two fixed point values
       return (self.val() == b.val())
 
    def __gt__(self,b):
       """ greather than comparison """
-      if (isinstance(b,int) | isinstance(b,float)):
-         return(self.val() > b)
+
+      if (MODE_RELAXED_WITH_ERROR_CHECKING):
+         if (isinstance(b,int) | isinstance(b,float)):
+            return(self.val() > b)
       return (self.val() > b.val())
 
    def __lt__(self,b):
       """ less than comparison """
-      if (isinstance(b,int) | isinstance(b,float)):
-         return(self.val() < b)
+
+      if (MODE_RELAXED_WITH_ERROR_CHECKING):
+         if (isinstance(b,int) | isinstance(b,float)):
+            return(self.val() < b)
       return (self.val() < b.val())
 
    def __ge__(self,b):
       """ greater or equal to """
-      if (isinstance(b,int) | isinstance(b,float)):
-         return(self.val() >= b)
+
+      if (MODE_RELAXED_WITH_ERROR_CHECKING):
+         if (isinstance(b,int) | isinstance(b,float)):
+            return(self.val() >= b)
       return (self.val() >= b.val())
 
    def __le__(self,b):
       """ less than or equal to """
-      if (isinstance(b,int) | isinstance(b,float)):
-         return(self.val() <= b)
+
+      if (MODE_RELAXED_WITH_ERROR_CHECKING):
+         if (isinstance(b,int) | isinstance(b,float)):
+            return(self.val() <= b)
       return (self.val() <= b.val())
 
 
@@ -185,95 +199,81 @@ class FixedPoint:
 
    def __add__(self, b):
       """ add function """
-      if (isinstance(b,int) | isinstance(b,float)):
-         retval = self + FixedPoint(b, self.int_bits, self.frac_bits)
+
+      if MODE_STRICT_WITHOUT_ERROR_CHECKING:
+         retval = FixedPoint(0,self.int_bits, self.frac_bits) 
+         retval.encoded = retval.clip(self.encoded+b.encoded)
          return retval
 
-#      if ((b.int_bits != self.int_bits) | (b.frac_bits != self.frac_bits)):
-#         print "Error in addition: adding two numbers with different reps"
-#      else:
-         
-      retval = FixedPoint(0,self.int_bits, self.frac_bits) 
-      retval.encoded = retval.clip(self.encoded+b.encoded)
+      if MODE_STRICT_WITH_ERROR_CHECKING:
+         assert(b.int_bits == self.int_bits) & (b.frac_bits == self.frac_bits), "Strict mode: operands not aligned"
+         retval = FixedPoint(0,self.int_bits, self.frac_bits) 
+         retval.encoded = retval.clip(self.encoded+b.encoded)
+         return retval
+
+      if (isinstance(b,int) | isinstance(b,float)):
+         retval = FixedPoint(self.val() + b, self.int_bits, self.frac_bits)
+      else:
+         retval = FixedPoint(self.val() + b.val(), self.int_bits, self.frac_bits)
       return retval
+
 
    def __radd__(self, b):
-      if (isinstance(b,int) | isinstance(b,float)):
-         retval = FixedPoint(b, self.int_bits, self.frac_bits) + self
-         return retval
+      """ radd function """
+      return (self.__add__(b) )
 
-#      if ((b.int_bits != self.int_bits) |
-#          (b.frac_bits != self.frac_bits)):
-#         print "Error in addition: adding two numbers with different reps"
-#      else:
-         
-      retval = FixedPoint(0,self.int_bits, self.frac_bits) 
-      retval.encoded = retval.clip(self.encoded+b.encoded)
-      return retval
 
    def __sub__(self, b):
-      if (isinstance(b,int) | isinstance(b,float)):
-         retval = self - FixedPoint(b, self.int_bits, self.frac_bits)
+      """ subtract function """
+
+      if MODE_STRICT_WITHOUT_ERROR_CHECKING:
+         retval = FixedPoint(0,self.int_bits, self.frac_bits) 
+         retval.encoded = retval.clip(self.encoded-b.encoded)
          return retval
 
-#      if ((b.int_bits != self.int_bits) |
-#          (b.frac_bits != self.frac_bits)):
-#         print "Error in addition: subtracting two numbers with different reps"
-#      else:
-      retval = FixedPoint(0,self.int_bits, self.frac_bits) 
-      retval.encoded = retval.clip(self.encoded-b.encoded)
+      if MODE_STRICT_WITH_ERROR_CHECKING:
+         assert(b.int_bits == self.int_bits) & (b.frac_bits == self.frac_bits), "Strict mode: operands not aligned"
+         retval = FixedPoint(0,self.int_bits, self.frac_bits) 
+         retval.encoded = retval.clip(self.encoded-b.encoded)
+         return retval
+
+      if (isinstance(b,int) | isinstance(b,float)):
+         retval = FixedPoint(self.val() - b, self.int_bits, self.frac_bits)
+      else:
+         retval = FixedPoint(self.val() - b.val(), self.int_bits, self.frac_bits)
       return retval
 
+   def __rsub__(self,b):
+      """ rsub function """
+
+      if MODE_STRICT_WITHOUT_ERROR_CHECKING:
+         retval = FixedPoint(0,self.int_bits, self.frac_bits) 
+         retval.encoded = retval.clip(b.encoded-self.encoded)
+         return retval
+
+      if MODE_STRICT_WITH_ERROR_CHECKING:
+         assert(b.int_bits == self.int_bits) & (b.frac_bits == self.frac_bits), "Strict mode: operands not aligned"
+         retval = FixedPoint(0,self.int_bits, self.frac_bits) 
+         retval.encoded = retval.clip(b.encoded-self.encoded)
+         return retval
+
+      if (isinstance(b,int) | isinstance(b,float)):
+         retval = FixedPoint(b - self.val(), self.int_bits, self.frac_bits)
+      else:
+         retval = FixedPoint(b.val() - self.val(), self.int_bits, self.frac_bits)
+      return retval
 
    def __iadd__(self, b):
-      print "IN IADD"
+      """ __iadd__ :  adding using the += operator """
+      return(self.__add__(b))
 
-   def __imul__(self, b):
-      print "IN IMUL"
-
-
-   def __rsub__(self, b):
-      if (isinstance(b,int) | isinstance(b,float)):
-         retval = FixedPoint(b, self.int_bits, self.frac_bits) - self
-         return retval
-
-#      if ((b.int_bits != self.int_bits) |
-#          (b.frac_bits != self.frac_bits)):
-#         print "Error in addition: subtracting two numbers with different reps"
-#      else:
-      retval = FixedPoint(0,self.int_bits, self.frac_bits) 
-      retval.encoded = retval.clip(self.encoded-b.encoded)
-      return retval
-
+   def __isub__(self, b):
+      """ __isub__ :  adding using the -= operator """
+      return(self.__sub__(b))
 
    def __neg__(self):
-         retval = FixedPoint(0,self.int_bits, self.frac_bits)  - self
-         return retval
-
-   def __mul__(self, b):
-      if (isinstance(b,int) | isinstance(b,float)):
-         retval = self * FixedPoint(b, self.int_bits, self.frac_bits)
-         return retval
-
-#      if ((b.int_bits != self.int_bits) |
-#          (b.frac_bits != self.frac_bits)):
-#         print "Error in multiply: multiplying two numbers with different reps"
-#      else:
-      retval = FixedPoint(0,self.int_bits, self.frac_bits) 
-      retval.encoded = retval.clip((self.encoded*b.encoded)/ (1<<self.frac_bits))
-      return retval
-
-   def __rmul__(self, b):
-      if (isinstance(b,int) | isinstance(b,float)):
-         retval = self * FixedPoint(b, self.int_bits, self.frac_bits)
-         return retval
-
-#      if ((b.int_bits != self.int_bits) |
-#          (b.frac_bits != self.frac_bits)):
-#        print "Error in multiply: multiplying two numbers with different reps"
-#      else:
-      retval = FixedPoint(0,self.int_bits, self.frac_bits) 
-      retval.encoded = retval.clip((self.encoded*b.encoded)/ (1<<self.frac_bits))
+      """ take the negative of a fixed point value """
+      retval = FixedPoint(0,self.int_bits, self.frac_bits)  - self
       return retval
 
 #  probably never want to use this, since things may not be exactly 0,
@@ -282,40 +282,91 @@ class FixedPoint:
    def __bool__(self):
       return( self.encoded != 0) 
 
-   def __div__(self, b):
-      if (isinstance(b,int) | isinstance(b,float)):
-         retval = self / FixedPoint(b, self.int_bits, self.frac_bits)
+
+   def __mul__(self, b):
+      """ multiply function """
+
+      if MODE_STRICT_WITHOUT_ERROR_CHECKING:
+         retval = FixedPoint(0,self.int_bits, self.frac_bits) 
+         retval.encoded = retval.clip((self.encoded*b.encoded)/ (1<<self.frac_bits))
          return retval
 
-#      if ((b.int_bits != self.int_bits) |
-#          (b.frac_bits != self.frac_bits)):
-#         print "Error in divide: multiplying two numbers with different reps"
-#      else:
-      retval = FixedPoint(0,self.int_bits, self.frac_bits) 
-      retval.encoded = retval.clip(round((self.encoded * (1<< self.frac_bits)) / b.encoded))
+      if MODE_STRICT_WITH_ERROR_CHECKING:
+         assert(b.int_bits == self.int_bits) & (b.frac_bits == self.frac_bits), "Strict mode: operands not aligned"
+         retval = FixedPoint(0,self.int_bits, self.frac_bits) 
+         retval.encoded = retval.clip((self.encoded*b.encoded)/ (1<<self.frac_bits))
+         return retval
+
+      if (isinstance(b,int) | isinstance(b,float)):
+         retval = FixedPoint(self.val() * b, self.int_bits, self.frac_bits)
+      else:
+         retval = FixedPoint(self.val() * b.val(), self.int_bits, self.frac_bits)
       return retval
+
+   def __rmul__(self, b):
+      """ rmul function """
+      return (self.__mul__(b) )
+
+   def __imul__(self, b):
+      """ __imul__ :  adding using the *= operator """
+      return(self.__mul__(b))
+
+
+   def __div__(self, b):
+      """ divide function """
+
+      if MODE_STRICT_WITHOUT_ERROR_CHECKING:
+         retval = FixedPoint(0,self.int_bits, self.frac_bits) 
+         retval.encoded = retval.clip(round((self.encoded * (1<< self.frac_bits)) / b.encoded))
+         return retval
+
+      if MODE_STRICT_WITH_ERROR_CHECKING:
+         assert(b.int_bits == self.int_bits) & (b.frac_bits == self.frac_bits), "Strict mode: operands not aligned"
+         retval = FixedPoint(0,self.int_bits, self.frac_bits) 
+         retval.encoded = retval.clip(round((self.encoded * (1<< self.frac_bits)) / b.encoded))
+         return retval
+
+      if (isinstance(b,int) | isinstance(b,float)):
+         retval = FixedPoint(float(self.val()) / float(b), self.int_bits, self.frac_bits)
+      else:
+         retval = FixedPoint(float(self.val()) / float(b.val()), self.int_bits, self.frac_bits)
+      return retval
+
 
    def __rdiv__(self, b):
-      if (isinstance(b,int) | isinstance(b,float)):
-         retval = FixedPoint(b, self.int_bits, self.frac_bits) /self
+      """ reverse divide function """
+
+      if MODE_STRICT_WITHOUT_ERROR_CHECKING:
+         retval = FixedPoint(0,self.int_bits, self.frac_bits) 
+         retval.encoded = retval.clip(round((b.encoded * (1<< self.frac_bits)) / self.encoded))
          return retval
 
-#      if ((b.int_bits != self.int_bits) |
-#          (b.frac_bits != self.frac_bits)):
-#         print "Error in divide: multiplying two numbers with different reps"
-#      else:
-      retval = FixedPoint(0,self.int_bits, self.frac_bits) 
-      retval.encoded = retval.clip(round((self.encoded * (1<< self.frac_bits)) / b.encoded))
+      if MODE_STRICT_WITH_ERROR_CHECKING:
+         assert(b.int_bits == self.int_bits) & (b.frac_bits == self.frac_bits), "Strict mode: operands not aligned"
+         retval = FixedPoint(0,self.int_bits, self.frac_bits) 
+         retval.encoded = retval.clip(round((b.encoded * (1<< self.frac_bits)) / self.encoded))
+         return retval
+
+      if (isinstance(b,int) | isinstance(b,float)):
+         retval = FixedPoint(float(b) / float(self.val()), self.int_bits, self.frac_bits)
+      else:
+         retval = FixedPoint(float(b.val()) / float(self.val()), self.int_bits, self.frac_bits)
       return retval
+
+   def __idiv__(self, b):
+      """ __idiv__ :  adding using the /= operator """
+      return(self.__div__(b))
 
 
    def exp(a):
+      """ exponent """
       if (isinstance(a,int) | isinstance(a,float)):
          return(math.exp(a))
       else:
          return( FixedPoint( math.exp(a), a.int_bits, a.frac_bits) )
 
    def tanh(a):
+      """ tanh """
       if (isinstance(a,int) | isinstance(a,float)):
          return(math.tanh(a))
       else:
