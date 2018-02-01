@@ -34,7 +34,8 @@ import collections
 import time
 import math
 from FixedPoint import FixedPoint
-from Settings import *
+from Misc import *
+from ArrayUtilities import *
 
 num_training_examples = 1000
 num_validation_examples = 10

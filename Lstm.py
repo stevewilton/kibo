@@ -34,8 +34,8 @@ import collections
 import time
 from FixedPoint import FixedPoint
 import math
-from Settings import *
 from Misc import *
+from ArrayUtilities import *
 
 
 class LSTM(object):

@@ -35,10 +35,10 @@ import time
 import math
 import os
 from FixedPoint import FixedPoint
-from Settings import *
 from Misc import *
 from Dense import *
 from Lstm import *
+from ArrayUtilities import *
 
 class Network(object):
 

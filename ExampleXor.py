@@ -38,9 +38,9 @@ import collections
 import time
 import math
 from FixedPoint import FixedPoint
+from ArrayUtilities import *
 from Lstm import LSTM
 from Dense import Dense
-from Settings import *
 from Network import *
 
 

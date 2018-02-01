@@ -35,7 +35,8 @@ import collections
 import time
 import math
 from FixedPoint import FixedPoint
-from Settings import *
+from Misc import *
+from ArrayUtilities import *
 
 # Hyper-parameters
 DATASET_FILE = "fm_data.bin"

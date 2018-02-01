@@ -37,10 +37,10 @@ import math
 from FixedPoint import FixedPoint
 from Lstm import LSTM
 from Dense import Dense
-from Settings import *
 from Network import *
 from WorkloadChars import *
-
+from Misc import *
+from ArrayUtilities import *
 
 print "Constructing data set"
 

@@ -36,9 +36,9 @@ import math
 from FixedPoint import FixedPoint
 from Lstm import LSTM
 from Dense import Dense
-from Settings import *
 from Network import *
 from WorkloadFMAnomalies import *
+from ArrayUtilities import *
 
 
 # Hyper-parameters
