@@ -11,7 +11,22 @@ from WorkloadChars import *
 from Misc import *
 from ArrayUtilities import *
 
-f = FixedPoint(0.25,7,8)
-g = FixedPoint(3.0,12,4)
-f = 1/f
-print f
+
+
+print "doing floating point test"
+start =  time.clock()
+for i in range(0,100):
+  a1 = return_random_np_subarray(100,100,0,1.0, 0,8,8)
+  b1  = return_random_np_subarray(100,100,0,1.0, 0,8,8)
+  c1 = mydot(a1,b1)
+end =  time.clock()
+print "time = ",end-start
+
+print "doing fixed point test"
+start =  time.clock()
+for i in range(0,100):
+  a1 = return_random_np_subarray(100,100,0,1.0, 1,8,8)
+  b1  = return_random_np_subarray(100,100,0,1.0, 1,8,8)
+  c1 = mydot(a1,b1)
+end =  time.clock()
+print "time = ",end-start

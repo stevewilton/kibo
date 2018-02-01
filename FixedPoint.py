@@ -31,9 +31,9 @@ import math
 
 # One of the following should be set:
 
-MODE_STRICT_WITH_ERROR_CHECKING = 0
+MODE_STRICT_WITH_ERROR_CHECKING = 1
 MODE_STRICT_WITHOUT_ERROR_CHECKING = 0
-MODE_RELAXED_WITH_ERROR_CHECKING = 1
+MODE_RELAXED_WITH_ERROR_CHECKING = 0
 
 # Strict Mode.  In Strict mode, all operands must be of the same
 # type, and any conversions between types need to be done explicitly,
@@ -90,7 +90,6 @@ class FixedPoint:
       self.max_value = (1<<(int_bits-1+frac_bits))-1
       self.min_value = -(1<<(int_bits-1+frac_bits))
       self.encoded = self.encode(stored_value)      
-      
    def clip(self, x):
       """ Clip a value if it lies outside the allowable range"""
       return max(self.min_value,min(self.max_value, x))
@@ -136,6 +135,13 @@ class FixedPoint:
       print "min_value = 0x%x" % self.min_value
       print "decoded value = %f" % self.decode(self.encoded)
 
+   def get_int_bits(self):
+      """ return the number of integer bits """
+      return self.int_bits
+
+   def get_frac_bits(self):
+      """ return the number of factional bits """
+      return self.frac_bits
 
    #######################################################################
    # Over-ride comparison functions.  Note that these comparison functions

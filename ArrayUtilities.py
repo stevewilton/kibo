@@ -115,9 +115,11 @@ def convert_array_to_fixed(f, rows,columns, int_bits, frac_bits):
 def mydot(a,b):
      """ perform a dot product.  If it is fixed point, convert to floating point first, for speed """
      if isinstance(a[0][0], FixedPoint):
+        int_bits = a[0][0].get_int_bits()
+        frac_bits = a[0][0].get_frac_bits()
         a_float = convert_array_to_float(a, a.shape[0], a.shape[1])
         b_float = convert_array_to_float(b, b.shape[0], b.shape[1]);
         c_float = np.dot(a_float, b_float)
-        return(convert_array_to_fixed(c_float, c_float.shape[0], c_float.shape[1]))
+        return(convert_array_to_fixed(c_float, c_float.shape[0], c_float.shape[1], int_bits, frac_bits))
      else:
         return(np.dot(a,b))
