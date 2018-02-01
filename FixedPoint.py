@@ -28,10 +28,30 @@ from Settings import *
 #---------------------------------------------------------------------------
 
 
-# Defaults
+# Strict Mode.  In Strict mode, all operands must be of the same
+# type, and any conversions between types need to be done explicitly,
+# using resize function.  In Non-strict mode, you can do things like
+#     a = b + 1.2 
+# and the constant 1.2 will be converted to fixed point.  In non-strict
+# mode, you can also do arithmetic on fixed point values of different sizes;
+# in that case, the result will be the size of the first operand
+#
+STRICT_MODE = 0
+
+# Fast mode: if you are in fast mode, no error checking on operand types 
+# for arithmetic operations is done.  Note that fast mode only works if you
+# are in STRICT_MODE
+#
+FAST_MODE = 0
+
+assert (FAST_MODE==0) | (STRICT_MODE==1) , "FAST_MODE can only used if STRICT_MODE is true"
+
+
+# Defaults.  
 
 FRAC_BITS = 16
 INT_BITS = 8
+
 
 class FixedPoint:
 
@@ -40,16 +60,32 @@ class FixedPoint:
 
       assert int_bits > 0, "int_bits must be greater than 0"
       assert frac_bits > 0, "frac_bits must be greater than 0"
-      
+      assert isinstance(value, int) | isinstance(value, float) | isinstance(value, FixedPoint), "initialized value type error"
+
+      if (isinstance(value, FixedPoint)):
+         value_to_store = value.val()
+      else:
+         value_to_store = value
+            
       self.int_bits = int_bits
       self.frac_bits = frac_bits 
       self.max_value = (1<<(int_bits-1+frac_bits))-1
       self.min_value = -(1<<(int_bits-1+frac_bits))
-      if (value == 0):
-         self.encoded = 0
-      else:
-         self.encoded = self.encode(value)
+      self.encoded = self.encode(value_to_store)
 
+   def resize(self, int_bits, frac_bits):
+      """ Convert the value to a new representation, but keep the value the same """
+
+      assert int_bits > 0, "int_bits must be greater than 0"
+      assert frac_bits > 0, "frac_bits must be greater than 0"
+
+      stored_value = self.val()
+      self.int_bits = int_bits
+      self.frac_bits = frac_bits 
+      self.max_value = (1<<(int_bits-1+frac_bits))-1
+      self.min_value = -(1<<(int_bits-1+frac_bits))
+      self.encoded = self.encode(stored_value)      
+      
    def clip(self, x):
       """ Clip a value if it lies outside the allowable range"""
       return max(self.min_value,min(self.max_value, x))
@@ -76,7 +112,7 @@ class FixedPoint:
       
    def string_raw(self):
       """ Return the raw (encoded) value.  Normally only use this for debugging """
-      return "0x%x" % self.encoded
+      return "x%x" % self.encoded
 
    def __str__(self):
       """ string representation.  Include the size and the decoded value """      """ string representation.  Include the size and the decoded value """
@@ -141,11 +177,16 @@ class FixedPoint:
       return (self.val() <= b.val())
 
 
-   # 
+   ########################################################################
+   #
+   #  Over-riding arithmetic functions. 
+   #
+   ########################################################################
 
    def __add__(self, b):
+      """ add function """
       if (isinstance(b,int) | isinstance(b,float)):
-         retval = self + FixedPoint(b)
+         retval = self + FixedPoint(b, self.int_bits, self.frac_bits)
          return retval
 
 #      if ((b.int_bits != self.int_bits) | (b.frac_bits != self.frac_bits)):
@@ -158,7 +199,7 @@ class FixedPoint:
 
    def __radd__(self, b):
       if (isinstance(b,int) | isinstance(b,float)):
-         retval = FixedPoint(b) + self
+         retval = FixedPoint(b, self.int_bits, self.frac_bits) + self
          return retval
 
 #      if ((b.int_bits != self.int_bits) |
@@ -172,7 +213,7 @@ class FixedPoint:
 
    def __sub__(self, b):
       if (isinstance(b,int) | isinstance(b,float)):
-         retval = self - FixedPoint(b)
+         retval = self - FixedPoint(b, self.int_bits, self.frac_bits)
          return retval
 
 #      if ((b.int_bits != self.int_bits) |
@@ -193,7 +234,7 @@ class FixedPoint:
 
    def __rsub__(self, b):
       if (isinstance(b,int) | isinstance(b,float)):
-         retval = FixedPoint(b) - self
+         retval = FixedPoint(b, self.int_bits, self.frac_bits) - self
          return retval
 
 #      if ((b.int_bits != self.int_bits) |
@@ -211,7 +252,7 @@ class FixedPoint:
 
    def __mul__(self, b):
       if (isinstance(b,int) | isinstance(b,float)):
-         retval = self * FixedPoint(b)
+         retval = self * FixedPoint(b, self.int_bits, self.frac_bits)
          return retval
 
 #      if ((b.int_bits != self.int_bits) |
@@ -224,7 +265,7 @@ class FixedPoint:
 
    def __rmul__(self, b):
       if (isinstance(b,int) | isinstance(b,float)):
-         retval = self * FixedPoint(b)
+         retval = self * FixedPoint(b, self.int_bits, self.frac_bits)
          return retval
 
 #      if ((b.int_bits != self.int_bits) |
@@ -243,7 +284,7 @@ class FixedPoint:
 
    def __div__(self, b):
       if (isinstance(b,int) | isinstance(b,float)):
-         retval = self / FixedPoint(b)
+         retval = self / FixedPoint(b, self.int_bits, self.frac_bits)
          return retval
 
 #      if ((b.int_bits != self.int_bits) |
@@ -256,7 +297,7 @@ class FixedPoint:
 
    def __rdiv__(self, b):
       if (isinstance(b,int) | isinstance(b,float)):
-         retval = FixedPoint(b) /self
+         retval = FixedPoint(b, self.int_bits, self.frac_bits) /self
          return retval
 
 #      if ((b.int_bits != self.int_bits) |
