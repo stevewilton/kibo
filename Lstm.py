@@ -103,7 +103,7 @@ class LSTM(object):
        else:
           print "Dont know how to preturb that matrix"
 
-    def __init__(self, num_inputs, num_outputs):
+    def __init__(self, num_inputs, num_outputs, fixed_point = 0, int_bits = 0, frac_bits = 0):
 
 #       Initialize weights
 
@@ -113,24 +113,27 @@ class LSTM(object):
        self.num_inputs = num_inputs
        self.num_outputs = num_outputs
        self.num_hidden = num_hidden
+       self.fixed_point = fixed_point
+       self.int_bits = int_bits
+       self.frac_bits = frac_bits
 
 #       Initialize the following weight and bias matrices
 #       Note that the bias for the forget is special, we initialize it all to 1
 
-       self.Wf = return_random_np_subarray(num_hidden, num_inputs + num_outputs)
-       self.Bf = return_one_np_subarray(num_hidden, 1)
-       self.Wi = return_random_np_subarray(num_hidden, num_inputs + num_outputs)
-       self.Bi = return_random_np_subarray(num_hidden, 1)
-       self.Wc = return_random_np_subarray(num_hidden, num_inputs + num_outputs)
-       self.Bc = return_random_np_subarray(num_hidden, 1)
-       self.Wo = return_random_np_subarray(num_outputs, num_inputs + num_outputs)
-       self.Bo = return_random_np_subarray(num_outputs, 1)
+       self.Wf = return_random_np_subarray(num_hidden, num_inputs + num_outputs, fixed_point, int_bits, frac_bits)
+       self.Bf = return_one_np_subarray(num_hidden, 1, fixed_point, int_bits, frac_bits)
+       self.Wi = return_random_np_subarray(num_hidden, num_inputs + num_outputs, fixed_point, int_bits, frac_bits)
+       self.Bi = return_random_np_subarray(num_hidden, 1, fixed_point, int_bits, frac_bits)
+       self.Wc = return_random_np_subarray(num_hidden, num_inputs + num_outputs, fixed_point, int_bits, frac_bits)
+       self.Bc = return_random_np_subarray(num_hidden, 1, fixed_point, int_bits, frac_bits)
+       self.Wo = return_random_np_subarray(num_outputs, num_inputs + num_outputs, fixed_point, int_bits, frac_bits)
+       self.Bo = return_random_np_subarray(num_outputs, 1, fixed_point, int_bits, frac_bits)
 
        # initialize internal state
-       self.Ct = return_constant_np_subarray(num_hidden,1, 0.0)
+       self.Ct = return_constant_np_subarray(num_hidden,1, 0.0, fixed_point, int_bits, frac_bits)
 
        # initialize previous output
-       self.ht = return_constant_np_subarray(num_outputs,1, 0.0)
+       self.ht = return_constant_np_subarray(num_outputs,1, 0.0, fixed_point, int_bits, frac_bits)
 
 
 
@@ -139,10 +142,10 @@ class LSTM(object):
 #      Keep weights the same, but reset internal state
 
        # initialize internal state
-       self.Ct = return_constant_np_subarray(self.num_hidden,1, 0.0)
+       self.Ct = return_constant_np_subarray(self.num_hidden,1, 0.0, self.fixed_point, self.int_bits, self.frac_bits)
 
        # initialize previous output
-       self.ht = return_constant_np_subarray(self.num_outputs,1, 0.0)
+       self.ht = return_constant_np_subarray(self.num_outputs,1, 0.0, self.fixed_point, self.int_bits, self.frac_bits)
 
 
 

@@ -63,7 +63,7 @@ class Dense(object):
        self.W = np.load(directoryName+"/level"+str(level)+"_W.npy")
        self.B = np.load(directoryName+"/level"+str(level)+"_B.npy")
 
-    def __init__(self, num_inputs, num_outputs):
+    def __init__(self, num_inputs, num_outputs, fixed_point = 0, int_bits = 0, frac_bits = 0):
 
 #       Initialize weights
 
@@ -74,8 +74,8 @@ class Dense(object):
 
 #       Initialize the following weight and bias matrices
 
-       self.W = return_random_np_subarray(num_outputs, num_inputs)
-       self.B = return_constant_np_subarray(num_outputs, 1, -1)
+       self.W = return_random_np_subarray(num_outputs, num_inputs, fixed_point, int_bits, frac_bits)
+       self.B = return_constant_np_subarray(num_outputs, 1, -1, fixed_point, int_bits, frac_bits)
 
 #    def preturb_weight(self, y_index, x_index, delta):
 #       self.W[y_index][x_index] = self.W[y_index][x_index] + delta

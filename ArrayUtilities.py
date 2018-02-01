@@ -36,59 +36,64 @@ import time
 import math
 from FixedPoint import *
 
-FIXED_POINT = 1
-
    
-def return_random_np_subarray(rows, columns, mean=0, stddev=0.1):
+def return_random_np_subarray(rows, columns, mean=0, stddev=0.1, fixed_point=0, int_bits=0, frac_bits=0):
+        """ return a random 2D np sub-array.  Populate it either with fixed point or floating point numbers """
         arr = []
         for y in range(0,rows):
             subarray = []
             for x in range(0,columns):
-                if FIXED_POINT:
-                   subarray.append(FixedPoint(random.gauss(mean,stddev)))
+                if fixed_point:
+                   subarray.append(FixedPoint(random.gauss(mean,stddev),int_bits,frac_bits))
                 else:
                    subarray.append(random.gauss(mean,stddev))
             arr.append(subarray)
         return np.array(arr)
 
    
-def return_one_np_subarray(rows, columns):
+def return_one_np_subarray(rows, columns, fixed_point, int_bits, frac_bits):
+        """ return a 2D np sub-array filled with 1s.  Populate it either with fixed point or floating point numbers """
         arr = []
         for y in range(0,rows):
             subarray = []
             for x in range(0,columns):
-                if FIXED_POINT:
-                   subarray.append(FixedPoint(1.0))
+                if fixed_point:
+                   subarray.append(FixedPoint(1.0,int_bits, frac_bits))
                 else:
                    subarray.append(1.0)
             arr.append(subarray)
         return np.array(arr)
 
-def return_zero_np_subarray(rows, columns):
+def return_zero_np_subarray(rows, columns, fixed_point, int_bits, frac_bits):
+        """ return a 2D np sub-array filled with 0s.  Populate it either with fixed point or floating point numbers """
         arr = []
         for y in range(0,rows):
             subarray = []
             for x in range(0,columns):
-                if FIXED_POINT:
-                   subarray.append(FixedPoint(0.0))
+                if fixed_point:
+                   subarray.append(FixedPoint(0.0, int_bits, frac_bits))
                 else:
                    subarray.append(0.0)
             arr.append(subarray)
         return np.array(arr)
 
-def return_constant_np_subarray(rows, columns, val):
+def return_constant_np_subarray(rows, columns, val, fixed_point, int_bits, frac_bits):
+        """ return a 2D np sub-array filled with a constant value.  Populate it either with fixed point or floating point numbers """
         arr = []
         for y in range(0,rows):
             subarray = []
             for x in range(0,columns):
-                if FIXED_POINT:
-                   subarray.append(FixedPoint(val))
+                if fixed_point:
+                   subarray.append(FixedPoint(val, int_bits, frac_bits))
                 else:
                    subarray.append(val)
             arr.append(subarray)
         return np.array(arr)
 
+# Some local routines used in mydot
+
 def convert_array_to_float(f, rows,columns):
+        """ convert a fixed point np array to a floating point np array """
         arr = []
         for y in range(0,rows):
             subarray = []
@@ -97,17 +102,19 @@ def convert_array_to_float(f, rows,columns):
             arr.append(subarray)
         return np.array(arr)
 
-def convert_array_to_fixed(f, rows,columns):
+def convert_array_to_fixed(f, rows,columns, int_bits, frac_bits):
+        """ convert a floating point np array to a fixed point np array """
         arr = []
         for y in range(0,rows):
             subarray = []
             for x in range(0,columns):
-                   subarray.append(FixedPoint(f[y][x]))
+                   subarray.append(FixedPoint(f[y][x], int_bits, frac_bits))
             arr.append(subarray)
         return np.array(arr)
 
 def mydot(a,b):
-     if FIXED_POINT:
+     """ perform a dot product.  If it is fixed point, convert to floating point first, for speed """
+     if isinstance(a[0][0], FixedPoint):
         a_float = convert_array_to_float(a, a.shape[0], a.shape[1])
         b_float = convert_array_to_float(b, b.shape[0], b.shape[1]);
         c_float = np.dot(a_float, b_float)

@@ -45,6 +45,8 @@ from ArrayUtilities import *
 FFT_WINDOW_SIZE = 32
 LAYER_SIZES = [16,8,16,32]
 FIXED_POINT = 0
+INT_BITS = 8
+FRAC_BITS = 8
 
 print "Constructing data set"
 
@@ -53,7 +55,7 @@ training_set, validation_set, test_set = WorkloadFMAnomalies(FFT_WINDOW_SIZE)
 
 print "Initializing Network"
 
-network = Network(FFT_WINDOW_SIZE)
+network = Network(FFT_WINDOW_SIZE, FIXED_POINT, INT_BITS, FRAC_BITS)
 for layer_size in LAYER_SIZES:
     network.add_level(0,layer_size)
 

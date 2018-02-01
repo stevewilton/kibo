@@ -72,7 +72,7 @@ class Network(object):
 #       self.lstm.reset()
 #       # nothing to reset in the Dense layer
 
-    def __init__(self, num_inputs):
+    def __init__(self, num_inputs, fixed_point = 0, int_bits=0, frac_bits =0):
        print ("In Network Constructor")
 
        self.num_inputs = num_inputs
@@ -80,6 +80,9 @@ class Network(object):
        self.level_type = {}  
        self.level = {}
        self.outputs_from_last_level = num_inputs
+       self.fixed_point = fixed_point
+       self.int_bits = int_bits
+       self.frac_bits = frac_bits
 
     # type = 0 for dense and 1 for lstm
     # for a dense, the level size indicates the number of neurons in that level
@@ -90,14 +93,14 @@ class Network(object):
        if (level_type == 0):
           # Dense level
           self.level_type [self.num_levels] = 0
-          self.level [self.num_levels] = Dense(self.outputs_from_last_level, level_size)
+          self.level [self.num_levels] = Dense(self.outputs_from_last_level, level_size, self.fixed_point, self.int_bits, self.frac_bits)
           self.outputs_from_last_level = level_size
           self.num_outputs = level_size
           self.num_levels = self.num_levels + 1
        elif (level_type == 1):
           # LSTM Level
           self.level_type [self.num_levels] = 1
-          self.level [self.num_levels] = LSTM(self.outputs_from_last_level, level_size)
+          self.level [self.num_levels] = LSTM(self.outputs_from_last_level, level_size, self.fixed_point, self.int_bits, self.frac_bits)
           self.num_outputs = level_size
           self.outputs_from_last_level = level_size
           self.num_levels = self.num_levels + 1

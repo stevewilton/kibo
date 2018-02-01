@@ -43,6 +43,8 @@ from Misc import *
 from ArrayUtilities import *
 
 FIXED_POINT = 0
+INT_BITS = 8
+FRAC_BITS = 8
 
 print "Constructing data set"
 
@@ -50,9 +52,8 @@ training_set, validaton_set, test_set, vocab_size, reverse_dictionary = Workload
 
 print "Initializing Network"
 
-#network = Network(vocab_size, vocab_size, vocab_size, 0)
 
-network = Network(vocab_size)
+network = Network(vocab_size, FIXED_POINT, INT_BITS, FRAC_BITS)
 network.add_level(1, vocab_size)
 network.add_level(0, vocab_size)
 
