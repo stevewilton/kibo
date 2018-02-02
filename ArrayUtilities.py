@@ -37,7 +37,7 @@ import math
 from FixedPoint import *
 
    
-def return_random_np_subarray(rows, columns, mean=0, stddev=0.1, fixed_point=0, int_bits=0, frac_bits=0):
+def return_random_np_subarray(rows, columns, fixed_point=0, int_bits=0, frac_bits=0, mean=0, stddev=0.1):
         """ return a random 2D np sub-array.  Populate it either with fixed point or floating point numbers """
         arr = []
         for y in range(0,rows):
