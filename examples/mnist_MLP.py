@@ -39,7 +39,7 @@ import pandas as pd
 import scipy.io as sio
 import os
 import logging as logger
-#from FixedPoint import FixedPoint
+from FixedPoint import FixedPoint
 from Lstm import LSTM
 from Dense import Dense
 from Network import *
@@ -55,23 +55,12 @@ def split(arr):
 # Map to a one hot encoding
 def one_hot(val, len):
   if FIXED_POINT:
-     retval = [[FixedPoint(-0.00) for col in range(1)] for row in range(len)]
+     retval = [[FixedPoint(0.) for col in range(1)] for row in range(len)]
      retval[val][0] = FixedPoint(1)
   else:
-     retval = [[-0.00 for col in range(1)] for row in range(len)]
+     retval = [[0. for col in range(1)] for row in range(len)]
      retval[val][0] = 1.0
   return(retval)
-
-# Import data for ECG tests
-def import_matfiles(dataDirectory,percentageForTest):
-    data_array = []
-    if not os.path.exists(dataDirectory):
-        print("ECG data not found. Please make sure you are setting the directory correctly")
-        exit()
-
-    # data_array is an array of arrays containing the training sequence of size sample_length     
-    # label table has the expected outputs for each training sequence
-    return data_array, trainingData, testData, label_table
 
 def train():
     total_error = 0
@@ -85,7 +74,7 @@ def train():
        #Converting the output to one_hot
        imageLabel = one_hot(labelsTraining[i],10)
 
-
+       # Train network
        o = network.train(imagesTraining[i], imageLabel, 0.001)
 
        # Save the error only for the last batch
@@ -96,26 +85,24 @@ def train():
 
 
 def getAccuracy():
-    # Variables used for calculating accuracy
-    samples=0.0
-    hit=0
+    # Variables used for counting good predictions
+    hit=0.
 
     # Loop through all elements of test set
     for i in range(len(imagesTest)):
        #Converting the output to one_hot
        imageLabel = one_hot(labelsTest[i],10)
 
+       # Get loss from forward pass
        o = network.forward_pass(imagesTest[i])
        
+       # Check if our prediction is accurate
        correctLabel=np.argmax(imageLabel)
        netWorkLabel=np.argmax(o)
-
-       samples=samples+1
        if correctLabel==netWorkLabel:
           hit=hit+1
 
-
-    print ("\tAccuracy = " +str(hit/samples*100 ) +"%")
+    print ("\tAccuracy = " +str(hit/len(imagesTest)*100 ) +"%")
 
 def shuffleEqually(a, b):
     rng_state = np.random.get_state()
