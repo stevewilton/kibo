@@ -45,7 +45,7 @@ def sigmoid_prime(z):
     return sigmoid(z)*(1.0-sigmoid(z)) 
 
 def tanh(z):
-    return (1.0-np.exp(-2*z))/(1.0+np.exp(-2*z))
+    return (1.0-np.exp(-2.*z))/(1.0+np.exp(-2.*z))
 
 def tanh_prime(z): 
     return 1.0 - np.tanh(z) * np.tanh(z)
@@ -53,3 +53,14 @@ def tanh_prime(z):
 def get_cost(a, y):
     return 0.5*np.sum((a-y)*(a-y))
 
+def softmax(z):
+    e = np.exp(z - np.amax(z))
+    return e / np.sum(e)
+
+def relu(z):
+    return np.abs(z)
+
+def relu_prime(z):
+    z[z<=0] = 0
+    z[z>0] = 1
+    return z
