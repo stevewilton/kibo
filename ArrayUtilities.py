@@ -36,7 +36,17 @@ import time
 import math
 from FixedPoint import *
 
-   
+
+def quantize_and_clip(arr, int_bits, frac_bits):
+    max_value = (1<<(int_bits-1+frac_bits))-1
+    min_value = -(1<<(int_bits-1+frac_bits))
+    for i in range(0,arr.shape[0]):
+       for j in range(0,arr.shape[1]):
+          x = round(arr[i][j] * (1<<frac_bits))
+          x = min_value if x<min_value else max_value if x > max_value else x
+          arr[i][j] = float(x) / (1<<frac_bits) 
+
+ 
 def return_random_np_subarray(rows, columns, mean=0, stddev=0.1, fixed_point=0, int_bits=0, frac_bits=0):
         """ return a random 2D np sub-array.  Populate it either with fixed point or floating point numbers """
         arr = []
@@ -123,3 +133,8 @@ def mydot(a,b):
         return(convert_array_to_fixed(c_float, c_float.shape[0], c_float.shape[1], int_bits, frac_bits))
      else:
         return(np.dot(a,b))
+
+
+
+def mydot_slow(a,b):
+   return(np.dot(a,b))

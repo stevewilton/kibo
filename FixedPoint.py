@@ -31,8 +31,8 @@ import math
 
 # One of the following should be set:
 
-MODE_STRICT_WITH_ERROR_CHECKING = 1
-MODE_STRICT_WITHOUT_ERROR_CHECKING = 0
+MODE_STRICT_WITH_ERROR_CHECKING = 0
+MODE_STRICT_WITHOUT_ERROR_CHECKING = 1
 MODE_RELAXED_WITH_ERROR_CHECKING = 0
 
 # Strict Mode.  In Strict mode, all operands must be of the same
@@ -63,26 +63,29 @@ class FixedPoint:
    def __init__(self, value=0, int_bits=INT_BITS, frac_bits=FRAC_BITS):
       """ Create an Fixed Point object. """
 
-      assert int_bits >= 1, "int_bits must be greater or equal than 1"
-      assert frac_bits >= 0, "frac_bits must be greater or eqaul than 0"
-      assert isinstance(value, int) | isinstance(value, float) | isinstance(value, FixedPoint), "initialized value type error"
+      if MODE_STRICT_WITHOUT_ERROR_CHECKING == 0:
+         assert int_bits >= 1, "int_bits must be greater or equal than 1"  
+         assert frac_bits >= 0, "frac_bits must be greater or eqaul than 0"
+         assert isinstance(value, int) | isinstance(value, float) | isinstance(value, FixedPoint), "initialized value type error" 
 
-      if (isinstance(value, FixedPoint)):
-         value_to_store = value.val()
-      else:
-         value_to_store = value
-            
+      value_to_store = value.val() if isinstance(value, FixedPoint) else value
+                  
       self.int_bits = int_bits
       self.frac_bits = frac_bits 
       self.max_value = (1<<(int_bits-1+frac_bits))-1
       self.min_value = -(1<<(int_bits-1+frac_bits))
-      self.encoded = self.encode(value_to_store)
+      if (value_to_store == 0):  # just for speed in common case
+         self.encoded = 0
+      else:
+         self.encoded = self.encode(value_to_store)
+
 
    def resize(self, int_bits, frac_bits):
       """ Convert the value to a new representation, but keep the value the same """
 
-      assert int_bits >= 1, "int_bits must be greater or equal than 1"
-      assert frac_bits >= 0, "frac_bits must be greater or equal than 0"
+      if MODE_STRICT_WITHOUT_ERROR_CHECKING == 0:
+         assert int_bits >= 1, "int_bits must be greater or equal than 1"
+         assert frac_bits >= 0, "frac_bits must be greater or equal than 0"
 
       stored_value = self.val()
       self.int_bits = int_bits
@@ -90,14 +93,16 @@ class FixedPoint:
       self.max_value = (1<<(int_bits-1+frac_bits))-1
       self.min_value = -(1<<(int_bits-1+frac_bits))
       self.encoded = self.encode(stored_value)      
+
    def clip(self, x):
       """ Clip a value if it lies outside the allowable range"""
-      return max(self.min_value,min(self.max_value, x))
+      return self.min_value if x<self.min_value else self.max_value if x > self.max_value else x
 
    def encode(self, value):
       """ Convert a value to the encoded representation and clip it """
-      return self.clip(round(value * (1<< self.frac_bits)))
-                   
+      x =  round(value * (1<< self.frac_bits))
+      return self.min_value if x<self.min_value else self.max_value if x > self.max_value else x
+                         
    def decode(self, encoded_value):
       """ Return the decoded value."""
       return float(encoded_value) / (1 << self.frac_bits)
