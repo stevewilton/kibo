@@ -88,12 +88,12 @@ class Network(object):
     # for a dense, the level size indicates the number of neurons in that level
     # for a lstm, the level size indicates the number of hidden units in that level
    
-    def add_level(self, level_type, level_size):
+    def add_level(self, level_type, level_size, level_activation='tanh'):
 
        if (level_type == 0):
           # Dense level
           self.level_type [self.num_levels] = 0
-          self.level [self.num_levels] = Dense(self.outputs_from_last_level, level_size, self.fixed_point, self.int_bits, self.frac_bits)
+          self.level [self.num_levels] = Dense(self.outputs_from_last_level, level_size, level_activation, self.fixed_point, self.int_bits, self.frac_bits)
           self.outputs_from_last_level = level_size
           self.num_outputs = level_size
           self.num_levels = self.num_levels + 1

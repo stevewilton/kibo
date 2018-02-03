@@ -63,7 +63,7 @@ class Dense(object):
        self.W = np.load(directoryName+"/level"+str(level)+"_W.npy")
        self.B = np.load(directoryName+"/level"+str(level)+"_B.npy")
 
-    def __init__(self, num_inputs, num_outputs, fixed_point = 0, int_bits = 0, frac_bits = 0):
+    def __init__(self, num_inputs, num_outputs, activation, fixed_point = 0, int_bits = 0, frac_bits = 0):
 
 #       Initialize weights
 
@@ -71,6 +71,7 @@ class Dense(object):
 
        self.num_inputs = num_inputs
        self.num_outputs = num_outputs
+       self.activation = activation
 
 #       Initialize the following weight and bias matrices
 
@@ -83,13 +84,26 @@ class Dense(object):
     def forward_pass(self, x):
         self.inputs = x
         self.z = mydot(self.W, np.array(x)) + self.B
-        self.a = tanh(self.z)
-        #self.a = sigmoid(self.z)
+        if self.activation=='sigmoid':
+          self.a = sigmoid(self.z)
+        elif self.activation=='softmax':
+          self.a = softmax(self.z)
+        elif self.activation=='tanh':
+          self.a = tanh(self.z)
+        elif self.activation=='relu':
+          self.a = relu(self.z)
         return (self.a)
 
     def get_deltas(self, deltas_from_previous_layer):
-        self.deltas = deltas_from_previous_layer * tanh_prime(self.z)
-        #self.deltas = deltas_from_previous_layer * sigmoid_prime(self.z)
+        if self.activation=='sigmoid':
+          self.deltas = deltas_from_previous_layer * sigmoid_prime(self.z)
+        elif self.activation=='softmax':
+          self.deltas = deltas_from_previous_layer
+        elif self.activation=='tanh':
+          self.deltas = deltas_from_previous_layer * tanh_prime(self.z)
+        elif self.activation=='relu':
+          self.deltas = deltas_from_previous_layer * relu_prime(self.z)
+          
         deltas_to_send_to_next_layer = mydot(self.W.T, self.deltas)
         return(deltas_to_send_to_next_layer)
 
