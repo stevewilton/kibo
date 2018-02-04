@@ -82,8 +82,8 @@ class Dense(object):
 #       self.W[y_index][x_index] = self.W[y_index][x_index] + delta
 
     def forward_pass(self, x):
-        self.inputs = x
-        self.z = mydot(self.W, np.array(x)) + self.B
+        self.inputsT = x.T
+        self.z = mydot(self.W, x) + self.B
         if self.activation=='sigmoid':
           self.a = sigmoid(self.z)
         elif self.activation=='softmax':
@@ -103,12 +103,11 @@ class Dense(object):
           self.deltas = deltas_from_previous_layer * tanh_prime(self.z)
         elif self.activation=='relu':
           self.deltas = deltas_from_previous_layer * relu_prime(self.z)
-          
         deltas_to_send_to_next_layer = mydot(self.W.T, self.deltas)
         return(deltas_to_send_to_next_layer)
 
     def update_weights(self, learning_rate):
-       self.W = self.W - learning_rate * mydot(self.deltas,  np.array(self.inputs).T)
+       self.W = self.W - learning_rate * mydot(self.deltas,  self.inputsT)
        self.B = self.B - learning_rate * self.deltas
 
 #    def get_dcdw(self, yindex, xindex):

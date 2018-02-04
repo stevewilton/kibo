@@ -45,10 +45,12 @@ def sigmoid_prime(z):
     return sigmoid(z)*(1.0-sigmoid(z)) 
 
 def tanh(z):
-    return (1.0-np.exp(-2.*z))/(1.0+np.exp(-2.*z))
+    t = np.exp(-2.*z)
+    return (1.0-t)/(1.0+t)
 
 def tanh_prime(z): 
-    return 1.0 - np.tanh(z) * np.tanh(z)
+    t = np.tanh(z)
+    return 1.0 - t*t
 
 def get_cost(a, y):
     return 0.5*np.sum((a-y)*(a-y))

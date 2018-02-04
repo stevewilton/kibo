@@ -32,8 +32,8 @@ import math
 # One of the following should be set:
 
 MODE_STRICT_WITH_ERROR_CHECKING = 0
-MODE_STRICT_WITHOUT_ERROR_CHECKING = 1
-MODE_RELAXED_WITH_ERROR_CHECKING = 0
+MODE_STRICT_WITHOUT_ERROR_CHECKING = 0
+MODE_RELAXED_WITH_ERROR_CHECKING = 1
 
 # Strict Mode.  In Strict mode, all operands must be of the same
 # type, and any conversions between types need to be done explicitly,
@@ -55,7 +55,7 @@ assert(MODE_STRICT_WITH_ERROR_CHECKING + MODE_STRICT_WITHOUT_ERROR_CHECKING + MO
 # Defaults.  
 
 FRAC_BITS = 16
-INT_BITS = 8
+INT_BITS = 16
 
 
 class FixedPoint:

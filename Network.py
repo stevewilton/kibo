@@ -139,7 +139,7 @@ class Network(object):
 
 
     def forward_pass(self, x):
-       f = x
+       f = np.array(x)
        for i in range(0,self.num_levels):
           f = self.level[i].forward_pass(f)
        return f
@@ -151,8 +151,10 @@ class Network(object):
        err = 0.5*np.sum( (o-y)*(o-y) )
        deltas_to_send_down = o-y
 
+
        for i in range(self.num_levels-1, -1, -1):
           deltas_to_send_down = self.level[i].get_deltas(deltas_to_send_down)
+
 
        # now update the weights
        for i in range(0,self.num_levels):

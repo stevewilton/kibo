@@ -78,12 +78,27 @@ training_set_floating_point = [ [ [ [0.],[0.]], [0.]],
                                 [ [ [1.],[1.]], [0.]] ];
 evaluation_set_floating_point = training_set_floating_point
 
+training_set_fixed_point = [ [ [ [FixedPoint(0.,16,16)],[FixedPoint(0.,16,16)]], [FixedPoint(0.,16,16)]], 
+                                [ [ [FixedPoint(0.,16,16)],[FixedPoint(1.,16,16)]], [FixedPoint(1.,16,16)]],
+                                [ [ [FixedPoint(1.,16,16)],[FixedPoint(0.,16,16)]], [FixedPoint(1.,16,16)]],
+                                [ [ [FixedPoint(1.,16,16)],[FixedPoint(1.,16,16)]], [FixedPoint(0.,16,16)]] ];
+evaluation_set_fixed_point = training_set_floating_point
+
+
 print " "
 print "Example 1.  Start with a single neuron.  We would not expect"
 print "that this would train well, even for floating point"
 print " "
 print "Initializing Network"
 network = Network(2)
+network.add_level(0, 1)
+train_and_evaluate_xor_network(network, training_set_floating_point, evaluation_set_floating_point)
+
+print " "
+print "Example 2.  Start with a single neuron and fixed point"
+print " "
+print "Initializing Network"
+network = Network(2, 1, 16,16 )
 network.add_level(0, 1)
 train_and_evaluate_xor_network(network, training_set_floating_point, evaluation_set_floating_point)
 
