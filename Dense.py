@@ -62,6 +62,9 @@ class Dense(object):
     def load_weights_and_biases(self,directoryName,level):
        self.W = np.load(directoryName+"/level"+str(level)+"_W.npy")
        self.B = np.load(directoryName+"/level"+str(level)+"_B.npy")
+       if self.fixed_point:
+           self.B = convert_array_to_fixed(self.B,self.B.shape[0],self.B.shape[1], self.int_bits, self.frac_bits)
+           self.W = convert_array_to_fixed(self.W,self.W.shape[0],self.W.shape[1], self.int_bits, self.frac_bits)
 
     def __init__(self, num_inputs, num_outputs, activation, fixed_point = 0, int_bits = 0, frac_bits = 0):
 
@@ -72,6 +75,9 @@ class Dense(object):
        self.num_inputs = num_inputs
        self.num_outputs = num_outputs
        self.activation = activation
+       self.fixed_point=fixed_point
+       self.frac_bits=frac_bits
+       self.int_bits=int_bits
 
 #       Initialize the following weight and bias matrices
 

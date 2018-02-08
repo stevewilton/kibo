@@ -86,6 +86,15 @@ class LSTM(object):
        self.Bc = np.load(directoryName+"/level"+str(level)+"_Bc.npy")
        self.Wo = np.load(directoryName+"/level"+str(level)+"_Wo.npy")
        self.Bo = np.load(directoryName+"/level"+str(level)+"_Bo.npy")
+       if self.fixed_point:
+           self.Wf = convert_array_to_fixed(self.Wf,self.Wf.shape[0],self.Wf.shape[1], self.int_bits, self.frac_bits)
+           self.Bf = convert_array_to_fixed(self.Bf,self.Bf.shape[0],self.Bf.shape[1], self.int_bits, self.frac_bits)
+           self.Wi = convert_array_to_fixed(self.Wi,self.Wi.shape[0],self.Wi.shape[1], self.int_bits, self.frac_bits)
+           self.Bi = convert_array_to_fixed(self.Bi,self.Bi.shape[0],self.Bi.shape[1], self.int_bits, self.frac_bits)
+           self.Wc = convert_array_to_fixed(self.Wc,self.Wc.shape[0],self.Wc.shape[1], self.int_bits, self.frac_bits)
+           self.Bc = convert_array_to_fixed(self.Bc,self.Bc.shape[0],self.Bc.shape[1], self.int_bits, self.frac_bits)
+           self.Wo = convert_array_to_fixed(self.Wo,self.Wo.shape[0],self.Wo.shape[1], self.int_bits, self.frac_bits)
+           self.Bo = convert_array_to_fixed(self.Bo,self.Bo.shape[0],self.Bo.shape[1], self.int_bits, self.frac_bits)
 
     def print_internal_state(self):
        print ("\nC:")
