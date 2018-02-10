@@ -27,6 +27,8 @@ An example on how to use KIBO to learn time series data
 # WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #---------------------------------------------------------------------------
 
+print "This is a simple example. Try to make the window smaller and the training sample larger to make it more interesting"
+
 import sys
 sys.path.append('..')
 import traceback
@@ -41,7 +43,6 @@ from Network import *
 import numpy as np
 import ecg_generation as ecg
 import time
-import random
 
 def train():
     total_error = 0
@@ -75,21 +76,11 @@ def split(arr):
 def generateEcg(numSamples,timeLength):
   dataset = []
   for i in range(numSamples):
-    bpm = random.randint(60, 119)
     dataset.append(split(ecg.generateEcg(bpm,timeLength,noiseSD,samplingRate)))
-  return np.array(dataset)
-
-def generateTraining(numSamples,timeLength):
-  dataset = []
-  bpm = 60
-  dataset.append(split(ecg.generateEcg(bpm,timeLength,noiseSD,samplingRate)))
-  bpm = 119
-  dataset.append(split(ecg.generateEcg(bpm,timeLength,noiseSD,samplingRate)))
   return np.array(dataset)
 
 def getAccuracy():
 
-    p=[]
     # Loop through all elements of test set
     for i in range(len(testSet)):
        # Reset internal state of LSTM
@@ -106,14 +97,14 @@ def getAccuracy():
        for i in xrange(predictSamples):
            o = network.forward_pass(prediction[-windowSize:])
            prediction = np.concatenate([prediction,o])
-       p.append(prediction[:])
        
-    if showPlot:
-        ecg.ecgInteractivePlot(p[0][0:internalStateSamples],p[0][internalStateSamples:-1],p[1][0:internalStateSamples],p[1][internalStateSamples:-1],samplingRate)
+       if showPlot:
+           ecg.ecgInteractivePlot(prediction[0:internalStateSamples],prediction[internalStateSamples:-1],samplingRate,bpm)
 
 # Some parameters for the training and generatig data
-windowSize=25
-maxEpochs=100
+windowSize=40
+maxEpochs=50
+bpm = 60
 noiseSD=0.01
 samplingRate=50
 trainingSignalLength=5 #in seconds
@@ -124,8 +115,8 @@ showPlot=True
 
 # Dataset construction
 print "Creating data set..."
-trainingSet = generateEcg(100,trainingSignalLength+predictionSignalLength)
-testSet = generateTraining(1,trainingSignalLength+predictionSignalLength)
+trainingSet = generateEcg(50,trainingSignalLength+predictionSignalLength)
+testSet = generateEcg(1,trainingSignalLength+predictionSignalLength)
 internalStateWindow = [xrange(i,i+windowSize) for i in xrange(internalStateSamples-windowSize)]
 trainTestWindow= [xrange(i,i+windowSize) for i in xrange(internalStateSamples-windowSize,internalStateSamples+predictSamples-windowSize)]
 
@@ -140,17 +131,14 @@ network.add_level(denseLayer, 8,'tanh')
 network.add_level(denseLayer, 1,'tanh') 
 
 if showPlot:
-    ecg.ecgInteractivePlotAxes(0,internalStateSamples+predictSamples,-.5,.8)
+    ecg.ecgInteractivePlotAxes(0,internalStateSamples+predictSamples,-1,1)
 
-initialEpoch=0
-if initialEpoch!=0:
-    network.load_weights_and_biases("ecg_dual_epoch_"+str(initialEpoch))
 
-for epoch in range(initialEpoch,maxEpochs):
+for epoch in range(maxEpochs):
     print("Epoch "+str(epoch)+"/"+str(maxEpochs))
     getAccuracy()
     train()
-    if epoch%5==0:
-        network.save_weights_and_biases("ecg_dual_epoch_"+str(epoch))
+    if epoch%10==0:
+       network.save_weights_and_biases("mnist_epoch_"+str(epoch))
   
 
