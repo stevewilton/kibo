@@ -1,0 +1,131 @@
+
+Using Kibo
+
+Feb 10, 2018
+
+
+1.  Using FixedPoint objects
+
+The fixed point package is located in FixedPoint.py
+
+a) Modes:
+
+There are three flags you can set in FixedPoint.py.  Exactly one of these
+should be set to 1.
+
+         MODE_STRICT_WITH_ERROR_CHECKING
+         MODE_STRICT_WITHOUT_ERROR_CHECKING 
+         MODE_RELAXED_WITH_ERROR_CHECKING (recommended)
+
+Strict Mode vs. Relaxed Mode:
+  Strict Mode.  In Strict mode, all operands must be of the same
+  type, and any conversions between types need to be done explicitly,
+  using resize function.  In Non-strict mode, you can do things like
+      a = b + 1.2 
+  and the constant 1.2 will be converted to fixed point.  In non-strict
+  mode, you can also do arithmetic on fixed point values of different sizes;
+  in that case, the result will be the size of the first operand
+ 
+We recommend always using error checking, unless you really need speed.
+Note: the fastest selection is MODE_STRICT_WITHOUT_ERROR_CHECKING
+ 
+b) Using FixedPoint objects:
+
+You can define an object as follows:
+
+    x = FixedPoint(value, integer bits, fractional bits)
+
+So, for example, you could use the statement:
+ 
+    x = FixedPoint(3.14, 8, 8) 
+
+which would define a fixed point quanity x to have the value 3.14 (in fixed
+point).  The floating point number will be quantized and clipped.
+
+If you assign a fixed point object to another fixed point object, the new
+object will take on the same properties as the source.  So,
+
+     y = x
+
+will create a new fixed point object y with value 3.14 and dimensions (8,8)
+
+You can resize a fixed point object:
+
+     y.resize(4,4)
+
+which will change the dimensions of object y to (4,4) and will perform a
+quantization and clipping to the new size.
+
+Warning: you can not create an object with 0 integer bits.  This would be
+confusing, since at least one bit is needed for the sign bit.  If you need
+a number that ranges from -1 to 1, you can declare an object with 1 integer
+bit and some number of fractional bits.
+
+c) Arithmetic
+
+You can perform arithmetic on fixed point objects:
+
+    a = FixedPoint(5.2, 8, 8)
+    b = FixedPoint(3.1, 8, 8)
+    c = a + b
+
+If you are in strict mode, the operands have to have the same dimensions.
+If you are in relaxed mode, the result will take on the dimensions of the
+first operand.  Note that in relaxed mode, you can also do something like
+
+    c = c + 1
+
+which will add the constant 1 (treated as a fixed point object) to c.
+You can also add floating point variables, which will be converted to 
+fixed point before adding:
+
+    g = 3.14
+    c = c + g
+
+Note that mulitply, divide, and subtract are also implemented.  Comparison
+functions ==, =>, <=, <, >, are also implemented; if you are in strict mode,
+the operators have to have the same dimensions.  In relaxed mode, that is not
+required (so you can do a shortcut  if (x > 0) ... for example)
+
+Functions exp and tanh are provided; if the operands are fixed point, they
+will return fixed point values, while if the operands are floating point, 
+they will return floating point values.
+
+
+3.  Interaction with numpy:
+
+You can create np arrays of numpy objects just as you would normally
+create numpy arrays.  When you do an arithmetic operations (addition,
+subtraction, multiply, divide), the appropriate fixed point routines will
+be used and a numpy array with fixed point objects will be created.
+
+Note that as described in the paper, this can be considerably slower than
+floating point numpy operations.  This is especially true for a dot product
+(using np.dot).  To do a dot product, it is likely better to use
+the "conversion" method described in the paper.  To do this, call 
+mydot which is in ArrayUtilities.py.  If the arrays contain floating point
+quantities, it will call np.dot directly.  However, if the array
+contains fixed point quantities, it will convert each operand array to
+floating point, do the dot product, and convert it back.  The paper shows
+that this usually leads to significant performance improvements.  If you
+don't want this, you can call np.dot directly, and if it is fixed point,
+it will perform the "slow" method, by converting each intermediate value
+to fixed point (and quantizing and clipping).
+
+
+4.  Examples
+
+The examples directly contains code that implements the two examples
+described in the paper.  This is a good place to start to understand how
+to use Kibo.
+
+
+5.  Future development
+
+We will continue to work on this and update it occasionally.  If you wish
+to contribute, or to submit bug reports,  please contact stevew@ece.ubc.ca   
+
+Note the disclaimer on the top of each file.  Basically, the code is open
+source and you can do whatever you like with it, but we are not responsible
+for anything bad that happens if you use it.  Be sure to read and understand
+this before using Kibo for anything critical.
